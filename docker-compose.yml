@@ -1,0 +1,21 @@
+
+services:
+  db:
+    image: postgres:14.1-alpine
+    container_name: 'isone-db'
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    networks:
+      - isone-network
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+networks:
+  isone-network:
+
+volumes:
+  pg_data:
+

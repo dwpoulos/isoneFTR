@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "isoneftr"
+version = "0.1.0"
+description = "ISONE FTR Profit/Loss"
+authors = ["Dan Poulos <dan.poulos@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.2.3"
+sqlalchemy = "^2.0.35"
+psycopg = "^3.2.3"
+psycopg-binary = "3.2.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
