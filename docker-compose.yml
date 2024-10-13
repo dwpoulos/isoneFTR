@@ -12,6 +12,7 @@ services:
       - '5432:5432'
     volumes:
       - pg_data:/var/lib/postgresql/data
+      - ./ddl/isone_ftr.sql:/docker-entrypoint-initdb.d/create_tables.sql
 
 networks:
   isone-network:
