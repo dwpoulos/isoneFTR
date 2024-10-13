@@ -1,17 +1,11 @@
-import pandas as pd
-from sqlalchemy import create_engine
 import numpy as np
+import pandas as pd
 
-from ftr_logger import logger
-from ftr_utils import get_db_connection, is_auction_file_loaded, get_peak_offpeak_hours_in_year, \
-    get_peak_offpeak_hours_in_month, get_auction_year_month, get_hour_price
-
+from ftr_utils import get_hour_price
 
 #FTRs awarded in the off-peak auctions are valid for hours ending 2400 to 0700 on
 #weekdays and for hours ending 0100 to 2400 on weekends and NERC Holidays.
-
 # always sink minus source...and only need congestion...not LMP or losses
-# don't matter if it's DA or RT or DART..it's walays sink MINUS source
 
 
 def get_auction_results(year: int, month: int):
@@ -23,6 +17,11 @@ def get_auction_results(year: int, month: int):
     yearly_auction_results = load_auction_results(yearly_auction_file)
 
     monthly_auction_results = pd.concat([monthly_auction_results, yearly_auction_results])
+
+    monthly_auction_results.drop(
+        ['source_location_name', 'sink_location_name', 'source_location_type', 'sink_location_type', 'auction_file'],
+        axis=1, inplace=True)
+
     return monthly_auction_results
 
 
@@ -58,16 +57,7 @@ def load_auction_results(input_file: str) -> pd.DataFrame:
     auction_file_name = input_file[input_file.find('/') + 1:].split('.')[0]
     auction_df['auction_file'] = auction_file_name
 
-    year_peak,year_off_peak = get_peak_offpeak_hours_in_year(2024)
-    mohth_peak, month_offpeak = get_peak_offpeak_hours_in_month(2025, 3)
-
     auction_df['hour_price'] = auction_df.apply(
         lambda x: get_hour_price(x['price'], x['auction_name'], x['class_type']), axis=1)
-
-    # if not is_auction_file_loaded(auction_file_name):
-    #     with get_db_connection() as connection:
-    #         logger.info(f'Saving auction results to DB from {input_file}')
-    #         auction_df.to_sql("isone_auction", connection, if_exists='append', index=False)
-    #         logger.info(f'Finished saving auction results to DB from {input_file}')
 
     return auction_df

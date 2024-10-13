@@ -1,43 +1,63 @@
-import calendar
-
-from ftr_auction_results_isone import get_auction_results
-from ftr_utils import get_peak_offpeak_hours_in_year, get_peak_offpeak_hours_in_month, get_auction_year_month
-from iso_lmp_data import load_monthly_lmp_data
+import numpy as np
 import pandas as pd
 
-# for day in iterate_days_in_month(2024, 9):
-#     logger.info(f'Loading LMP for {day}')
-#     df = load_isone_lmp_data(day.strftime('%Y%m%d'))
-#     if not is_lmp_loaded(day):
-#         logger.info(f"Saving LMP data to DB for {day.strftime('%Y%m%d')}")
-#         save_isone_lmp_data(day, df)
-#     else:
-#         logger.info(f'Data exists for {day}')
-
-# year, month = get_auction_year_month('LT1 2024')
-# year1, month1 = get_auction_year_month('APR 2024 APR')
+from ftr_auction_results_isone import get_auction_results
+from ftr_logger import logger
+from iso_lmp_data import load_monthly_lmp_data
 
 year = 2024
 month = 3
 
 monthly_auction_results = get_auction_results(year, month)
+monthly_lmp = load_monthly_lmp_data(year, month)
 
+monthly_auction_results['buy_sell_adj'] = np.where((monthly_auction_results['buy_sell'] == 'BUY'),1,-1)
 
-monthly_lmp = pd.read_csv(f"lmp_data/lmp_{year}_{month}.csv")
+logger.info('Merging source lmp data')
+# monthly_lmp.reset_index().set_index(['location_id','class_type'], inplace=True)
+monthly_auction_results = pd.merge(monthly_auction_results, monthly_lmp[
+    ['location_id', 'location_name', 'congestion', 'class_type', 'datetime']], how='left',
+                                   left_on=['source_location_id', 'class_type'],
+                                   right_on=['location_id', 'class_type'])
+monthly_auction_results.drop(['location_id'], axis=1, inplace=True)
+monthly_auction_results.rename(columns={
+    "congestion": "source_congestion",
+    "location_name": "source_location_name",
+}, inplace=True)
 
+logger.info('Merging sink lmp data')
+# monthly_lmp.reset_index().set_index(['location_id', 'class_type', 'datetime'], inplace=True)
+monthly_auction_results = pd.merge(monthly_auction_results, monthly_lmp[
+    ['location_id', 'location_name', 'congestion', 'class_type', 'datetime']], how='left',
+                                   left_on=['sink_location_id', 'datetime'],
+                                   right_on=['location_id', 'datetime'])
+monthly_auction_results.rename(columns={
+    "congestion": "sink_congestion",
+    "location_name": "sink_location_name",
+}, inplace=True)
+monthly_auction_results.drop(['location_id'], axis=1, inplace=True)
 
-# monthly_lmp = load_monthly_lmp_data(year,month)
-# monthly_lmp.to_csv(f"lmp_{year}_{month}.csv")
+logger.info('Computing Revenue')
+monthly_auction_results['revenue'] = (
+        monthly_auction_results['mw'] *
+        (monthly_auction_results['sink_congestion'] - monthly_auction_results['source_congestion']) *
+        monthly_auction_results['buy_sell_adj']
+)
 
+logger.info('Computing Cost')
+monthly_auction_results['cost'] = (monthly_auction_results['mw'] *
+                                   monthly_auction_results['hour_price'] *
+                                   -1 * monthly_auction_results['buy_sell_adj'])
 
+logger.info('Computing Profit')
+monthly_auction_results['profit'] = monthly_auction_results['cost'] + monthly_auction_results['revenue']
 
-# for auction_file in os.listdir('auction_data'):
-#     file = os.path.join('auction_data', auction_file)
-#     load_auction_results(file)
-#     logger.info(f'Processing auction file {file}')
+# Can do hourly/daily breakdown here
 
+logger.info("Grouping Results")
+profit_loss = monthly_auction_results[['customer_name','revenue','cost','profit']]
+totals = monthly_auction_results.groupby(['customer_name'])[['revenue', 'cost', 'profit']].sum()
 
 print('Data Loaded')
-
-
-
+totals.to_csv(f'ftr_profit_loss{str(year)}{str(month)}.csv')
+print(totals.head())

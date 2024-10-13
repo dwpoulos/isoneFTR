@@ -1,14 +1,14 @@
 import calendar
 import datetime
-from ftr_logger import logger
+
 from sqlalchemy import create_engine, Connection, text
 
 
 def iterate_days_in_month(year, month):
-    """Iterates through each day in the specified month."""
+    """Iterate through each day in the specified month."""
 
     start_date = datetime.date(year, month, 1)
-    end_date = datetime.date(year, month, calendar._monthlen(year,month))
+    end_date = datetime.date(year, month, calendar._monthlen(year, month))
 
     current_date = start_date
     while current_date <= end_date:
@@ -42,8 +42,7 @@ def peak_offpeak(date_time) -> str:
     return 'ONPEAK' if 7 <= date_time.hour <= 23 else 'OFFPEAK'
 
 
-def get_peak_offpeak_hours_in_month(year, month) -> (int,int):
-
+def get_peak_offpeak_hours_in_month(year, month) -> (int, int):
     peak = 0
     off_peak = 0
 
@@ -54,11 +53,10 @@ def get_peak_offpeak_hours_in_month(year, month) -> (int,int):
         else:
             off_peak += 24
 
-    return peak,off_peak
+    return peak, off_peak
 
 
 def get_peak_offpeak_hours_in_year(year) -> (int, int, int):
-
     peak = 0
     off_peak = 0
     total_hours = 0
@@ -72,7 +70,7 @@ def get_peak_offpeak_hours_in_year(year) -> (int, int, int):
                 off_peak += 24
             total_hours += 24
 
-    return peak,off_peak,
+    return peak, off_peak,
 
 
 def get_auction_year_month(auction_name) -> (int, int):
@@ -86,7 +84,6 @@ def get_auction_year_month(auction_name) -> (int, int):
 
 
 def get_hour_price(price: float, auction_name: str, class_type: str) -> float:
-
     year, month = get_auction_year_month(auction_name)
     if month == 0:
         peak_hours, off_peak_hours = get_peak_offpeak_hours_in_year(year)
