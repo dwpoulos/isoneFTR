@@ -58,6 +58,6 @@ logger.info("Grouping Results")
 profit_loss = monthly_auction_results[['customer_name','revenue','cost','profit']]
 totals = monthly_auction_results.groupby(['customer_name'])[['revenue', 'cost', 'profit']].sum()
 
-print('Data Loaded')
+print('FTR Report Complete')
 totals.to_csv(f'ftr_profit_loss{str(year)}{str(month)}.csv')
 print(totals.head())
