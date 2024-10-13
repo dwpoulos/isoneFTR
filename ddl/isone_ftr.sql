@@ -14,6 +14,7 @@ CREATE TABLE public.isone_auction (
                                       mw float8 NULL,
                                       price float8 NULL,
                                       auction_file text NULL,
+                                      hour_price float8 NULL,
                                       CONSTRAINT isone_auction_pkey PRIMARY KEY (ftr_id)
 );
 
