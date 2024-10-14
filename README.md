@@ -15,9 +15,15 @@ pip install -r requirements.txt
 
 Run FTR Valuation for month (Example August 2024)
 ```shell
-python python ftr_valuation.py 202408
+python python ftr_valuation.py 08/2024
 ```
+Result written as csv to current folder
 
+ Example:  
+ ##### **ftr_profit_loss20248.csv**
+
+
+## Database
 For Database can use docker-compose.yml to start up db on localhost port 5432
 Credentials postgres/postgres
 ```shell
