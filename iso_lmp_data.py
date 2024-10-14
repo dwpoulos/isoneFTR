@@ -30,8 +30,6 @@ def load_isone_lmp_data(date: str) -> pd.DataFrame:
         skiprows=[0, 1, 2, 3, 5]
     )
 
-    lmp_df.to_csv('test.csv')
-
     lmp_df = lmp_df[lmp_df.H == 'D']
     lmp_df.drop('H', axis=1, inplace=True)
 
@@ -63,5 +61,7 @@ def save_isone_lmp_data(day: datetime.date, lmp_df: pd.DataFrame, replace: bool 
             lmp_df.to_sql("isone_lmp", connection, if_exists='append', index=False)
             logger.info('Data successfully saved')
             logger.info(f'Loaded isone lmp data for {day.strftime("%m/%d/%Y")}')
+        else:
+            logger.warn(f"Data already exists for {day.strftime('%Y%m%d')}")
 
 

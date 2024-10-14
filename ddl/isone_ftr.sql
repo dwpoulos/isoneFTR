@@ -19,11 +19,8 @@ CREATE TABLE public.isone_auction (
 );
 
 CREATE TABLE public.isone_lmp (
-                                  "date" text NULL,
-                                  he int8 NULL,
                                   location_id int8 NOT NULL,
                                   location_name text NULL,
-                                  location_type text NULL,
                                   lmp float8 NULL,
                                   energy float8 NULL,
                                   congestion float8 NULL,

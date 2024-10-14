@@ -22,10 +22,10 @@ def get_db_connection() -> Connection:
     return db.connect()
 
 
-def is_lmp_loaded(date: datetime.date) -> bool:
+def is_lmp_loaded(day: datetime.date) -> bool:
     with get_db_connection() as connection:
         result = connection.execute(
-            text("select date from isone_lmp where date = '{}' limit 1".format(date.strftime('%m/%d/%Y'))))
+            text("select * from isone_lmp where datetime = :day limit 1"), {"day": datetime.datetime(day.year, day.month, day.day, 1, 0, 0)})
         return result.rowcount == 1
 
 

@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 import pandas as pd
 
@@ -7,6 +9,21 @@ from iso_lmp_data import load_monthly_lmp_data
 
 year = 2024
 month = 3
+
+try:
+    args = sys.argv[1]
+    input = args.split('/')
+    month = int(input[0])
+    year = int(input[1])
+
+except IndexError:
+    print("Error: Please provide a valid Month in the format:  MM/YYYY.  Example 03/2024.")
+    sys.exit(0)
+
+except ValueError:
+    print("Error: Please provide a valid Month in the format:  MM/YYYY.  Example 03/2024.")
+    sys.exit(0)
+
 
 monthly_auction_results = get_auction_results(year, month)
 monthly_lmp = load_monthly_lmp_data(year, month)
