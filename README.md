@@ -42,7 +42,7 @@ Return to project folder and run scripts in ddl folder
 Load LMP data for day
 ```shell
 
-python imp_data_load.py 20241002
+python lmp_data_load.py 20241002
 
 ```
 
