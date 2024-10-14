@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from ftr_logger import logger
 from ftr_utils import get_hour_price
 
 #FTRs awarded in the off-peak auctions are valid for hours ending 2400 to 0700 on
@@ -13,7 +14,9 @@ def get_auction_results(year: int, month: int):
     monthly_auction_file = f"auction_data/monthly_ftr_auction_results_{date_str}.csv"
     yearly_auction_file = f"auction_data/long_term_1_ftr_auction_results_{str(year)}.csv"
 
+    logger.info(f"Loading auction results from {monthly_auction_file}")
     monthly_auction_results = load_auction_results(monthly_auction_file)
+    logger.info(f"Loading yearly auction results from {yearly_auction_file}")
     yearly_auction_results = load_auction_results(yearly_auction_file)
 
     monthly_auction_results = pd.concat([monthly_auction_results, yearly_auction_results])

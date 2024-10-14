@@ -3,6 +3,10 @@ import datetime
 
 from sqlalchemy import create_engine, Connection, text
 
+from ftr_logger import logger
+
+hours = {}
+
 
 def iterate_days_in_month(year, month):
     """Iterate through each day in the specified month."""
@@ -43,6 +47,11 @@ def peak_offpeak(date_time) -> str:
 
 
 def get_peak_offpeak_hours_in_month(year, month) -> (int, int):
+
+    if f"{year}{month}" in hours:
+        logger.debug(f"found in cache {year}{month}")
+        return hours[f"{year}{month}"]
+
     peak = 0
     off_peak = 0
 
@@ -53,10 +62,17 @@ def get_peak_offpeak_hours_in_month(year, month) -> (int, int):
         else:
             off_peak += 24
 
+    hours[f"{year}{month}"] = peak, off_peak
+
     return peak, off_peak
 
 
 def get_peak_offpeak_hours_in_year(year) -> (int, int, int):
+
+    if f"{year}" in hours:
+        logger.debug(f"found in cache {year}")
+        return hours[f"{year}"]
+
     peak = 0
     off_peak = 0
     total_hours = 0
@@ -69,6 +85,8 @@ def get_peak_offpeak_hours_in_year(year) -> (int, int, int):
             else:
                 off_peak += 24
             total_hours += 24
+
+    hours[f"{year}"] = peak, off_peak
 
     return peak, off_peak,
 
