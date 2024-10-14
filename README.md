@@ -15,7 +15,7 @@ pip install -r requirements.txt
 
 Run FTR Valuation for month (Example August 2024)
 ```shell
-python python ftr_valuation.py 08/2024
+python ftr_valuation.py 08/2024
 ```
 Result written as csv to current folder
 
